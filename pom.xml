@@ -19,6 +19,11 @@
             <artifactId>mybatis-generator-core</artifactId>
             <version>1.3.7</version>
         </dependency>
+        <dependency>
+            <groupId>com.jh</groupId>
+            <artifactId>jh-mybatis-generator</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
