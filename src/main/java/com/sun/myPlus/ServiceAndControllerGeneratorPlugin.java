@@ -1,5 +1,6 @@
 package com.sun.myPlus;
 
+import com.jiujie.framework.adapter.vo.ResponseResult;
 import com.jiujie.framework.mybatis.dao.pojo.Page;
 import org.mybatis.generator.api.GeneratedJavaFile;
 import org.mybatis.generator.api.GeneratedXmlFile;
@@ -446,6 +447,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.adapter.vo.ResponseResult"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(fullVoExtName));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.List"));
+        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Set"));
         serviceInterface.addImportedTypes(fullyQualifiedJavaTypeSet);
 
         //类的作用域
@@ -501,6 +503,15 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         method7.addParameter(new Parameter(new FullyQualifiedJavaType("String"), "currentUserId"));
         serviceInterface.addMethod(method7);
 
+        Method method9 = new Method("batchSave");
+        method9.setReturnType(new FullyQualifiedJavaType("ResponseResult"));
+        method9.addParameter(new Parameter(new FullyQualifiedJavaType("Set<" + voExtName + ">"), "set"));
+        method9.addParameter(new Parameter(new FullyQualifiedJavaType("String"), "currentUserId"));
+        method9.addParameter(new Parameter(new FullyQualifiedJavaType("String"), "realName"));
+        serviceInterface.addMethod(method9);
+
+
+
         if (mainTable!=null || detailTable!=null){
             String method8Name="";
             if (mainTable!=null){
@@ -538,6 +549,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Map"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.HashMap"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.List"));
+        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Set"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.ArrayList"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("org.springframework.stereotype.Service"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("org.springframework.transaction.annotation.Transactional"));
@@ -548,8 +560,8 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(fullEntityName));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(fullDaoName));
         if (detailTable != null) {
-            fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.mlh.production.pd.entity." + detailTable + "Entity"));
-            fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.mlh.production.pd.vo." + detailTable + "VOExt"));
+            fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(fullEntityName.substring(0,fullEntityName.lastIndexOf(".")+1) + detailTable + "Entity"));
+            fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(voExtPackage+"." + detailTable + "VOExt"));
         }
         clazz.addImportedTypes(fullyQualifiedJavaTypeSet);
 
@@ -734,6 +746,34 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         method7.addBodyLines(bodyLineList7);
         clazz.addMethod(method7);
 
+        Method method9 = new Method("batchSave");
+        method9.addAnnotation("@Override");
+        method9.setVisibility(JavaVisibility.PUBLIC);
+        method9.setReturnType(new FullyQualifiedJavaType("ResponseResult"));
+        method9.addParameter(new Parameter(new FullyQualifiedJavaType("Set<" + voExtName + ">"), "set"));
+        method9.addParameter(new Parameter(new FullyQualifiedJavaType("String"), "currentUserId"));
+        method9.addParameter(new Parameter(new FullyQualifiedJavaType("String"), "realName"));
+        List<String> bodyLineList9 = new ArrayList<>();
+        bodyLineList9.add("List<"+entityName+"> addList = new ArrayList<>();");
+        bodyLineList9.add("List<"+entityName+"> updateList = new ArrayList<>();");
+        bodyLineList9.add("for ("+voExtName+" voExt : set) {\n" +
+                "            "+entityName+" en = new "+entityName+"();\n" +
+                "            BeanCopy.copyProperties(voExt,en);\n" +
+                "            SqlUtil.setOperateTimeAndUserId(en,currentUserId,realName);\n" +
+                "            if (StringUtils.isBlank(voExt.getId())){\n" +
+                "                en.setId(null);\n" +
+                "                addList.add(en);\n" +
+                "            }else {\n" +
+                "                updateList.add(en);\n" +
+                "            }\n" +
+                "        }");
+
+        bodyLineList9.add(" this.getMyBatisDao().insertList(addList);\n" +
+                "        this.getMyBatisDao().updateNotNull(updateList);\n" +
+                "        return new ResponseResult(true,\"\",\"批量保存完成\");");
+        method9.addBodyLines(bodyLineList9);
+        clazz.addMethod(method9);
+
         if (mainTable!=null || detailTable!=null){
             String method8Name="";
             if (mainTable!=null){
@@ -801,6 +841,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.mlh.production.utils.PageWithParams"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.adapter.vo.ResponseResult"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.List"));
+        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Set"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("io.swagger.annotations.Api"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.github.xiaoymin.knife4j.annotations.ApiSort"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("javax.annotation.Resource"));
@@ -906,7 +947,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         Method method4 = new Method("save");
         method4.setVisibility(JavaVisibility.PUBLIC);
         method4.addAnnotation("@ApiOperation(\"新增和修改，id是空为新增，id有值为修改\")");
-        method4.addAnnotation("@ApiOperationSupport(order = " + (++ApiOperationSupportOrder) + ", ignoreParameters={\"voExt.createTs\",\"voExt.createUserId\",\"voExt.updateTs\",\"voExt.updateUserId\",\"voExt.rowNo\",\"voExt.rowState\",\"voExt.updateRealName\"})");
+        method4.addAnnotation("@ApiOperationSupport(order = " + (++ApiOperationSupportOrder) + ")");
         method4.addAnnotation("@PostMapping(\"/save.json\")");
         method4.setReturnType(new FullyQualifiedJavaType("ResponseResult"));
         Parameter parameter4 = new Parameter(new FullyQualifiedJavaType(voExtName), "voExt");
@@ -930,6 +971,21 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         bodyLineList5.add("return " + fieldServiceName + ".del(id,getCurrentUserId());");
         method5.addBodyLines(bodyLineList5);
         clazz.addMethod(method5);
+
+        Method method7 = new Method("batchSave");
+        method7.setVisibility(JavaVisibility.PUBLIC);
+        method7.addAnnotation("@ApiOperation(\"批量新增\")");
+        method7.addAnnotation("@ApiOperationSupport(order = " + (++ApiOperationSupportOrder) + ")");
+        method7.addAnnotation("@PostMapping(\"/batchSave.json\")");
+        method7.setReturnType(new FullyQualifiedJavaType("ResponseResult"));
+        Parameter parameter7 = new Parameter(new FullyQualifiedJavaType("Set<"+voExtName+">"), "set");
+        parameter7.addAnnotation("@RequestBody");
+        method7.addParameter(parameter7);
+        List<String> bodyLineList7 = new ArrayList<>();
+        bodyLineList7.add("return " + fieldServiceName + ".batchSave(set,getCurrentUserId(),getCurrentUser().getRealName());");
+        method7.addBodyLines(bodyLineList7);
+        clazz.addMethod(method7);
+
 
         if (mainTable!=null || detailTable!=null){
             String method8Name = "";
