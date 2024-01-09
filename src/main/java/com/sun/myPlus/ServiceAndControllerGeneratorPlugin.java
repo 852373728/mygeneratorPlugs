@@ -20,6 +20,8 @@ import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
 
 public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
 
+    private String aaa;
+
     // 项目目录，一般为 src/main/java
     private String targetProject;
 
