@@ -23,6 +23,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
     private String dfer;
 
     private String BBBB;
+    private String qqqqq;
 
     // 项目目录，一般为 src/main/java
     private String targetProject;
