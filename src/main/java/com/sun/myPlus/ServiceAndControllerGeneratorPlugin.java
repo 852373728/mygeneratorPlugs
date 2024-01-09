@@ -23,6 +23,8 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
     private String aaa;
     private String bbbb;
 
+    private String ccc;
+
     // 项目目录，一般为 src/main/java
     private String targetProject;
 
