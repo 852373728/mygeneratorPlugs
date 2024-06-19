@@ -1,7 +1,5 @@
 package com.sun.myPlus;
 
-import com.jiujie.framework.adapter.vo.ResponseResult;
-import com.jiujie.framework.mybatis.dao.pojo.Page;
 import org.mybatis.generator.api.GeneratedJavaFile;
 import org.mybatis.generator.api.GeneratedXmlFile;
 import org.mybatis.generator.api.IntrospectedTable;
@@ -20,13 +18,8 @@ import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
 
 public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
 
-    private String aaa;
-    private String bbbb;
 
-    private String llll;
-    private String ccc;
-
-    private String dddd;
+    private String rootPackage;
 
     // 项目目录，一般为 src/main/java
     private String targetProject;
@@ -123,11 +116,13 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
             valid = false;
         }
 */
+
         targetProject = properties.getProperty("targetProject");
         apiTargetProject = properties.getProperty("apiTargetProject");
         webTargetProject = properties.getProperty("webTargetProject");
         xmlTargetProject = properties.getProperty("xmlTargetProject");
 
+        rootPackage = properties.getProperty("rootPackage");
         voExtPackage = properties.getProperty("VoExtPackage");
         servicePackage = properties.getProperty("servicePackage");
         serviceImplPackage = properties.getProperty("serviceImplPackage");
@@ -451,7 +446,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         //添加导入类
         Set<FullyQualifiedJavaType> fullyQualifiedJavaTypeSet = new HashSet<>();
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.mybatis.dao.pojo.Page"));
-        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.mlh.production.utils.PageWithParams"));
+        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(rootPackage+".utils.PageWithParams"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.adapter.vo.ResponseResult"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(fullVoExtName));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.List"));
@@ -550,7 +545,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
 
         Set<FullyQualifiedJavaType> fullyQualifiedJavaTypeSet = new HashSet<>();
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.mybatis.dao.pojo.Page"));
-        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.mlh.production.utils.*"));
+        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(rootPackage+".utils.*"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.base.utils.UUIDUtils"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.adapter.vo.ResponseResult"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("javax.annotation.Resource"));
@@ -846,7 +841,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         Set<FullyQualifiedJavaType> fullyQualifiedJavaTypeSet = new HashSet<>();
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.mybatis.dao.pojo.Page"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("org.springframework.web.bind.annotation.*"));
-        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.mlh.production.utils.PageWithParams"));
+        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(rootPackage+".utils.PageWithParams"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.adapter.vo.ResponseResult"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.List"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Set"));
