@@ -20,9 +20,12 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
 
 
     private String rootPackage;
+    private String parentPackage;
+
+    private String parentDir;
 
     // 项目目录，一般为 src/main/java
-    private String targetProject;
+    private String serviceProject;
 
     private String apiTargetProject;
 
@@ -42,13 +45,11 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
 
     private String xmlPackage;
     // service接口名前缀
-    private String servicePreffix;
+    private String servicePreffix="I";
 
     // service接口名后缀
-    private String serviceSuffix;
+    private String serviceSuffix="Service";
 
-    // service接口的父接口
-    //private String superServiceInterface;
 
     // service实现类的父类
     private String superServiceImpl;
@@ -56,9 +57,6 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
     private String superController;
 
     private String classRequestMapping;
-
-    // dao接口基类
-    private String superDaoInterface;
 
     // Example类的包名
 
@@ -96,47 +94,24 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
     public boolean validate(List<String> warnings) {
         boolean valid = true;
 
-       /* if (!stringHasValue(properties
-                .getProperty("targetProject"))) { //$NON-NLS-1$
-            warnings.add(getString("ValidationError.18", //$NON-NLS-1$
-                    "MapperConfigPlugin", //$NON-NLS-1$
-                    "targetProject")); //$NON-NLS-1$
-            valid = false;
-        }
-        if (!stringHasValue(properties.getProperty("servicePackage"))) { //$NON-NLS-1$
-            warnings.add(getString("ValidationError.18", //$NON-NLS-1$
-                    "MapperConfigPlugin", //$NON-NLS-1$
-                    "servicePackage")); //$NON-NLS-1$
-            valid = false;
-        }
-        if (!stringHasValue(properties.getProperty("serviceImplPackage"))) { //$NON-NLS-1$
-            warnings.add(getString("ValidationError.18", //$NON-NLS-1$
-                    "MapperConfigPlugin", //$NON-NLS-1$
-                    "serviceImplPackage")); //$NON-NLS-1$
-            valid = false;
-        }
-*/
 
-        targetProject = properties.getProperty("targetProject");
-        apiTargetProject = properties.getProperty("apiTargetProject");
-        webTargetProject = properties.getProperty("webTargetProject");
-        xmlTargetProject = properties.getProperty("xmlTargetProject");
+        parentDir = properties.getProperty("parentDir");
+        serviceProject = parentDir+"service\\src\\main\\java";
+        xmlTargetProject = parentDir+"service\\src\\main\\resources";
+        apiTargetProject = parentDir+"api\\src\\main\\java";
+        webTargetProject = parentDir+"web\\src\\main\\java";
+
 
         rootPackage = properties.getProperty("rootPackage");
-        voExtPackage = properties.getProperty("VoExtPackage");
-        servicePackage = properties.getProperty("servicePackage");
-        serviceImplPackage = properties.getProperty("serviceImplPackage");
-        controllerPackage = properties.getProperty("controllerPackage");
-        xmlPackage = properties.getProperty("xmlPackage");
-        daoPackage = properties.getProperty("daoPackage");
-
-        servicePreffix = properties.getProperty("servicePreffix");
-        servicePreffix = stringHasValue(servicePreffix) ? servicePreffix : "";
-        serviceSuffix = properties.getProperty("serviceSuffix");
-        serviceSuffix = stringHasValue(serviceSuffix) ? serviceSuffix : "";
+        parentPackage = properties.getProperty("parentPackage");
+        servicePackage = rootPackage+parentPackage+"service";
+        controllerPackage = rootPackage+parentPackage+"web";
+        voExtPackage = rootPackage+parentPackage+"vo";
+        serviceImplPackage = servicePackage;
+        xmlPackage = rootPackage+parentPackage+"sqlmapper";
+        daoPackage = rootPackage+parentPackage+"dao";
 
         superServiceImpl = properties.getProperty("superServiceImpl");
-        superDaoInterface = properties.getProperty("superDaoInterface");
 
         superController = properties.getProperty("superController");
         classRequestMapping = properties.getProperty("classRequestMapping");
@@ -383,7 +358,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         }
 
 
-        GeneratedJavaFile gjf = new GeneratedJavaFile(daoInterface, targetProject, context.getJavaFormatter());
+        GeneratedJavaFile gjf = new GeneratedJavaFile(daoInterface, serviceProject, context.getJavaFormatter());
         return gjf;
     }
 
@@ -828,7 +803,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         }
 
 
-        GeneratedJavaFile gjf2 = new GeneratedJavaFile(clazz, targetProject, context.getJavaFormatter());
+        GeneratedJavaFile gjf2 = new GeneratedJavaFile(clazz, serviceProject, context.getJavaFormatter());
         return gjf2;
     }
 
@@ -843,6 +818,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("org.springframework.web.bind.annotation.*"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType(rootPackage+".utils.PageWithParams"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.adapter.vo.ResponseResult"));
+        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Collections"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.List"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Set"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("io.swagger.annotations.Api"));
@@ -957,7 +933,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         parameter4.addAnnotation("@RequestBody");
         method4.addParameter(parameter4);
         List<String> bodyLineList4 = new ArrayList<>();
-        bodyLineList4.add("return " + fieldServiceName + ".save(voExt,getCurrentUserId(),getCurrentUser().getRealName());");
+        bodyLineList4.add("return this.batchSave(Collections.singleton(voExt));");
         method4.addBodyLines(bodyLineList4);
         clazz.addMethod(method4);
 
