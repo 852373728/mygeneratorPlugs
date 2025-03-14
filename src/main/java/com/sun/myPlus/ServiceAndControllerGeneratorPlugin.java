@@ -481,6 +481,13 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         method7.addParameter(new Parameter(new FullyQualifiedJavaType("String"), "currentUserId"));
         serviceInterface.addMethod(method7);
 
+        Method method10 = new Method("updateByCondition");
+        method10.setReturnType(new FullyQualifiedJavaType("ResponseResult"));
+        method10.addParameter(new Parameter(new FullyQualifiedJavaType(voExtName), "voEntity"));
+        method10.addParameter(new Parameter(new FullyQualifiedJavaType(voExtName), "voParams"));
+        method10.addParameter(new Parameter(new FullyQualifiedJavaType("String"), "currentUserId"));
+        serviceInterface.addMethod(method10);
+
         Method method9 = new Method("batchSave");
         method9.setReturnType(new FullyQualifiedJavaType("ResponseResult"));
         method9.addParameter(new Parameter(new FullyQualifiedJavaType("Set<" + voExtName + ">"), "set"));
@@ -524,11 +531,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.base.utils.UUIDUtils"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.adapter.vo.ResponseResult"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("javax.annotation.Resource"));
-        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Map"));
-        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.HashMap"));
-        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.List"));
-        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.Set"));
-        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.ArrayList"));
+        fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("java.util.*"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("org.springframework.stereotype.Service"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("org.springframework.transaction.annotation.Transactional"));
         fullyQualifiedJavaTypeSet.add(new FullyQualifiedJavaType("com.jiujie.framework.base.vo.BaseVO"));
@@ -580,6 +583,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         bodyLineList.add(entityConditionName + " condition = new " + entityConditionName + "();");
         bodyLineList.add("AddCondition.addCondition(condition.createCriteria(),pageWithParams.getCondition());");
         bodyLineList.add("condition.setPage(pageWithParams);");
+        bodyLineList.add("condition.setOrderByClause(\"create_ts desc\");");
         bodyLineList.add("Page page = this.getMyBatisDao().selectPageByCondition(condition);");
         bodyLineList.add("page.setRecords(BeanCopy.createNewList(page.getRecords(), " + voExtName + ".class));");
         bodyLineList.add("return page;");
@@ -723,6 +727,25 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         bodyLineList7.add("return new ResponseResult(true, \"\", \"删除成功\");");
         method7.addBodyLines(bodyLineList7);
         clazz.addMethod(method7);
+
+        Method method10 = new Method("updateByCondition");
+        method10.addAnnotation("@Override");
+        method10.setVisibility(JavaVisibility.PUBLIC);
+        method10.setReturnType(new FullyQualifiedJavaType("ResponseResult"));
+        method10.addParameter(new Parameter(new FullyQualifiedJavaType(voExtName), "voEntity"));
+        method10.addParameter(new Parameter(new FullyQualifiedJavaType(voExtName), "voParams"));
+        method10.addParameter(new Parameter(new FullyQualifiedJavaType("String"), "currentUserId"));
+        List<String> bodyLineList10 = new ArrayList<>();
+        bodyLineList10.add(entityConditionName + " condition = new " + entityConditionName + "();");
+        bodyLineList10.add("AddCondition.addCondition(condition.createCriteria(), voParams);");
+        bodyLineList10.add(entityName + " entity = new " + entityName + "();");
+        bodyLineList10.add("BeanCopy.copyProperties(voEntity, entity);\n"+
+        "        entity.setUpdateTs(new Date());\n"+
+        "        entity.setUpdateUserId(currentUserId);\n"+
+        "        this.getMyBatisDao().updateByCondition(entity, condition);");
+        bodyLineList10.add("return new ResponseResult(true, \"\", \"修改成功\");");
+        method10.addBodyLines(bodyLineList10);
+        clazz.addMethod(method10);
 
         Method method9 = new Method("batchSave");
         method9.addAnnotation("@Override");
