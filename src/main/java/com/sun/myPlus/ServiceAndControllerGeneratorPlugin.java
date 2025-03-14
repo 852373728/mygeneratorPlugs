@@ -757,6 +757,7 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
         List<String> bodyLineList9 = new ArrayList<>();
         bodyLineList9.add("List<"+entityName+"> addList = new ArrayList<>();");
         bodyLineList9.add("List<"+entityName+"> updateList = new ArrayList<>();");
+        bodyLineList9.add("List<String> delList = new ArrayList<>();");
         bodyLineList9.add("for ("+voExtName+" voExt : set) {\n" +
                 "            "+entityName+" en = new "+entityName+"();\n" +
                 "            BeanCopy.copyProperties(voExt,en);\n" +
@@ -765,12 +766,21 @@ public class ServiceAndControllerGeneratorPlugin extends PluginAdapter {
                 "                en.setId(null);\n" +
                 "                addList.add(en);\n" +
                 "            }else {\n" +
-                "                updateList.add(en);\n" +
+                "                if (voExt.getRowState()== BaseVO.RowStateEnum.DELETED.getValue()){\n" +
+                "                    delList.add(voExt.getId());\n" +
+                "                }else if (voExt.getRowState()== BaseVO.RowStateEnum.MODIFIED.getValue()){\n" +
+                "                    updateList.add(en);\n" +
+                "                }\n" +
                 "            }\n" +
                 "        }");
 
-        bodyLineList9.add(" this.getMyBatisDao().insertList(addList);\n" +
+        bodyLineList9.add("this.getMyBatisDao().insertList(addList);\n" +
                 "        this.getMyBatisDao().updateNotNull(updateList);\n" +
+                "        if (!delList.isEmpty()){\n" +"            "+
+                entityConditionName+" condition = new "+entityConditionName+"();\n" +
+                "            condition.createCriteria().andIdIn(delList);\n" +
+                "            this.getMyBatisDao().deleteByCondition(condition);\n" +
+                "        }\n" +
                 "        return new ResponseResult(true,\"\",\"批量保存完成\");");
         method9.addBodyLines(bodyLineList9);
         clazz.addMethod(method9);
